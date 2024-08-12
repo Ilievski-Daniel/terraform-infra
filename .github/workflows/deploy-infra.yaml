@@ -84,11 +84,6 @@ jobs:
             artifact-name: 'gcp-dev-tfplan'
 
     steps:
-    - name: Deployment Approval
-      uses: hmarr/auto-approve-action@v4
-      with:
-        review-message: "Approve/Deny infrastructure deployment for ${{ matrix.environment }}"
-        github-token: ${{ secrets.GIT_TOKEN }}
 
     - name: Download Plan File
       uses: actions/download-artifact@v3
