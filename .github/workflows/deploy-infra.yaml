@@ -86,9 +86,9 @@ jobs:
     steps:
 
     - name: Download Plan File
-      uses: actions/download-artifact@v3
+      uses: actions/download-artifact@v4
       with:
-        name: ${{ matrix.artifact-name }}
+        path: ${{ matrix.working-directory }}/tfplan
 
     - name: Terraform Apply
       working-directory: ${{ matrix.working-directory }}
