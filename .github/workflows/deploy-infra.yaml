@@ -82,8 +82,17 @@ jobs:
           });
 
           const commentPrefix = '### Terraform Report';
-          let commentId = null;
-          let commentToUpdate = comments.find(comment => comment.body.startsWith(commentPrefix));
+
+          // Delete comments with the specified prefix
+          for (const comment of comments) {
+            if (comment.body.startsWith(commentPrefix)) {
+              await github.rest.issues.deleteComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: comment.id
+              });
+            }
+          }
 
           const output = `#### Terraform Format and Style 🖌️ \`${{ steps.fmt.outcome }}\`
           #### Terraform Initialization ⚙️ \`${{ steps.init.outcome }}\`
@@ -108,23 +117,13 @@ jobs:
 
           *Pushed by: @${{ github.actor }}, Action: \`${{ github.event_name }}\`*`;
 
-          if (commentToUpdate) {
-            // Update existing comment
-            await github.rest.issues.updateComment({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              comment_id: commentToUpdate.id,
-              body: output
-            });
-          } else {
-            // Create new comment if no existing comment found
-            await github.rest.issues.createComment({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              issue_number: context.issue.number,
-              body: output
-            });
-          }
+          // Create new comment after cleanup
+          await github.rest.issues.createComment({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            issue_number: context.issue.number,
+            body: output
+          });
 
     - name: Terraform Plan Status
       if: steps.plan.outcome == 'failure'
