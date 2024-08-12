@@ -75,28 +75,9 @@ jobs:
       with:
         github-token: ${{ secrets.GIT_TOKEN }}
         script: |
-          const { data: comments } = await github.rest.issues.listComments({
-            owner: context.repo.owner,
-            repo: context.repo.repo,
-            issue_number: context.issue.number
-          });
-
-          const commentPrefix = '### Terraform Report';
-
-          // Delete comments with the specified prefix
-          for (const comment of comments) {
-            if (comment.body.startsWith(commentPrefix)) {
-              await github.rest.issues.deleteComment({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                comment_id: comment.id
-              });
-            }
-          }
-
-          const output = `#### Terraform Format and Style 🖌️ \`${{ steps.fmt.outcome }}\`
-          #### Terraform Initialization ⚙️ \`${{ steps.init.outcome }}\`
-          #### Terraform Validation 🤖 \`${{ steps.validate.outcome }}\`
+          const output = `#### Terraform Format and Style 🖌\`${{ steps.fmt.outcome }}\`
+          #### Terraform Initialization ⚙️\`${{ steps.init.outcome }}\`
+          #### Terraform Validation 🤖\`${{ steps.validate.outcome }}\`
           <details><summary>Validation Output</summary>
 
           \`\`\`\n
@@ -105,7 +86,7 @@ jobs:
 
           </details>
 
-          #### Terraform Plan 📖 \`${{ steps.plan.outcome }}\`
+          #### Terraform Plan 📖\`${{ steps.plan.outcome }}\`
 
           <details><summary>Show Plan</summary>
 
@@ -117,13 +98,12 @@ jobs:
 
           *Pushed by: @${{ github.actor }}, Action: \`${{ github.event_name }}\`*`;
 
-          // Create new comment after cleanup
-          await github.rest.issues.createComment({
+          github.rest.issues.createComment({
+            issue_number: context.issue.number,
             owner: context.repo.owner,
             repo: context.repo.repo,
-            issue_number: context.issue.number,
             body: output
-          });
+          })
 
     - name: Terraform Plan Status
       if: steps.plan.outcome == 'failure'
