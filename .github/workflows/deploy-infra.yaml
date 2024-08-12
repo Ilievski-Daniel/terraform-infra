@@ -60,6 +60,7 @@ jobs:
       working-directory: ${{ matrix.working-directory }}
       run: terraform plan
 
+    # TODO: Use bucket for Terraform state
     # TODO: Comment Terraform Plan on PR
     # TODO: Terraform Apply should not have -auto-aprove flag
 
