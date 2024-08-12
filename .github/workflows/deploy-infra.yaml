@@ -81,6 +81,7 @@ jobs:
         include:
           - environment: 'environments/gcp/dev'
             working-directory: 'environments/gcp/dev'
+            artifact-name: 'gcp-dev-tfplan'
 
     steps:
     - name: Deployment Approval
@@ -92,7 +93,7 @@ jobs:
     - name: Download Plan File
       uses: actions/download-artifact@v3
       with:
-        name: ${{ matrix.environment }}-tfplan
+        name: ${{ matrix.artifact-name }}
 
     - name: Terraform Apply
       working-directory: ${{ matrix.working-directory }}
