@@ -13,6 +13,10 @@ jobs:
     name: 'Terraform'
     runs-on: ubuntu-24.04
 
+    permissions:
+      contents: 'read'
+      id-token: 'write'
+
     # Use a matrix strategy to dynamically select the environment based on the changed files
     strategy:
       matrix:
