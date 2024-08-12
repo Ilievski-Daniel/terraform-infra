@@ -58,13 +58,13 @@ jobs:
 
     - name: Terraform Plan
       working-directory: ${{ matrix.working-directory }}
-      run: terraform plan -out=${{ github.workspace }}/tfplan
+      run: terraform plan -no-color 2>&1 | tee ${{ github.workspace }}/tfplan
 
     - name: Comment Terraform Plan on PR
       uses: blinqas/tf-plan-pr-comment@v1
       with:
         headline: "### Terraform Plan Output"
-        output_file: ${{ matrix.working-directory }}/tfplan
+        output_file: ${{ github.workspace }}/tfplan
       env:
         GITHUB_TOKEN: ${{ secrets.GIT_TOKEN }}
 
