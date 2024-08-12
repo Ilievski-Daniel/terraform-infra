@@ -3,7 +3,8 @@ name: Terraform Workflow
 on:
   push:
     branches:
-      - '**'
+      - 'main'
+  pull_request:
 
 jobs:
   terraform:
@@ -13,6 +14,7 @@ jobs:
     permissions:
       contents: 'read'
       id-token: 'write'
+      pull-requests: 'write'
 
     # Use a matrix strategy to dynamically select the environment based on the changed files
     strategy:
