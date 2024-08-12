@@ -58,16 +58,12 @@ jobs:
 
     - name: Terraform Plan
       working-directory: ${{ matrix.working-directory }}
-      run: terraform plan -no-color 2>&1 | tee ${{ github.workspace }}/plan_output.txt
+      run: terraform plan
 
-    - name: Comment Terraform Plan on PR
-      uses: blinqas/tf-plan-pr-comment@v1
-      with:
-        headline: "### Terraform Plan Output"
-        output_file: ${{ github.workspace }}/plan_output.txt
-      env:
-        GITHUB_TOKEN: ${{ secrets.GIT_TOKEN }}
+    # TODO: Comment Terraform Plan on PR
+    # TODO: Terraform Apply should not have -auto-aprove flag
 
     - name: Terraform Apply
+      working-directory: ${{ matrix.working-directory }}
       if: github.ref == 'refs/heads/main'
-      run: terraform apply ${{ github.workspace }}/plan_output.txt -auto-approve
+      run: terraform apply -auto-approve
