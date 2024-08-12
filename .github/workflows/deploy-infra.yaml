@@ -55,31 +55,13 @@ jobs:
       run: terraform validate
 
     - name: Terraform Plan
+      if: github.event_name == 'pull_request'
       id: plan
       working-directory: ${{ matrix.working-directory }}
       run: terraform plan -no-color
 
-    # TODO: Comment Terraform Plan on PR
-    # TODO: Terraform Apply should not have -auto-aprove flag
-
-    # - name: Check for active pull requests
-    #   id: check-pr
-    #   uses: actions/github-script@v7
-    #   with:
-    #     github-token: ${{ secrets.GIT_TOKEN }}
-    #     script: |
-    #       const branch = context.ref.replace('refs/heads/', '');
-    #       const prs = await github.rest.pulls.list({
-    #         owner: context.repo.owner,
-    #         repo: context.repo.repo,
-    #         head: `${context.repo.owner}:${branch}`,
-    #         state: 'open'
-    #       });
-    #       const hasOpenPR = prs.data.length > 0;
-    #       return hasOpenPR;
-
     - name: Comment PR
-      if: github.ref != 'refs/heads/main'
+      if: github.event_name == 'pull_request'
       uses: actions/github-script@v7
       with:
         github-token: ${{ secrets.GIT_TOKEN }}
@@ -94,6 +76,6 @@ jobs:
           })
 
     - name: Terraform Apply
+      if: github.ref == 'refs/heads/main' && github.event_name == 'pull_request'
       working-directory: ${{ matrix.working-directory }}
-      if: github.ref == 'refs/heads/main'
       run: terraform apply -auto-approve
