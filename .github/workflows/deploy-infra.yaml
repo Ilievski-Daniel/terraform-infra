@@ -1,0 +1,46 @@
+name: Terraform Workflow
+
+on:
+  push:
+    branches:
+      - '**'
+  pull_request:
+    branches:
+      - '**'
+
+jobs:
+  terraform:
+    name: 'Terraform'
+    runs-on: ubuntu-24.04
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Terraform
+      uses: hashicorp/setup-terraform@v3
+      with:
+        terraform_version: 1.9.4
+
+    - name: Terraform Init
+      run: terraform init
+
+    - name: Terraform Validate
+      run: terraform validate
+
+    - name: Terraform Plan
+      run: terraform plan
+      if: github.ref == 'refs/heads/main'
+
+  manual_approval:
+    name: 'Manual Approval'
+    runs-on: ubuntu-24.04
+    needs: terraform
+
+    steps:
+    - name: Deployment Approval
+      if: github.ref == 'refs/heads/main'
+      uses: hmarr/auto-approve-action@v4
+      with:
+        review-message: "Approve/Deny infrastructure deployment"
+        github-token: ${{ secrets.GIT_TOKEN }}
