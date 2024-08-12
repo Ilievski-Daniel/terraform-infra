@@ -13,6 +13,18 @@ jobs:
     name: 'Terraform'
     runs-on: ubuntu-24.04
 
+    # Use a matrix strategy to dynamically select the environment based on the changed files
+    strategy:
+      matrix:
+        environment:
+          - 'environments/gcp/dev'
+          - 'environments/gcp/prod'
+        include:
+          - environment: 'environments/gcp/dev'
+            working-directory: 'environments/gcp/dev'
+          - environment: 'environments/gcp/prod'
+            working-directory: 'environments/gcp/prod'
+
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
@@ -23,24 +35,53 @@ jobs:
         terraform_version: 1.9.4
 
     - name: Terraform Init
+      working-directory: ${{ matrix.working-directory }}
       run: terraform init
 
     - name: Terraform Validate
+      working-directory: ${{ matrix.working-directory }}
       run: terraform validate
 
     - name: Terraform Plan
-      run: terraform plan
+      working-directory: ${{ matrix.working-directory }}
+      run: terraform plan -out=tfplan
+
+    - name: Upload Plan File
       if: github.ref == 'refs/heads/main'
+      uses: actions/upload-artifact@v3
+      with:
+        name: ${{ matrix.environment }}-tfplan
+        path: ${{ matrix.working-directory }}/tfplan
 
   manual_approval:
     name: 'Manual Approval'
     runs-on: ubuntu-24.04
     needs: terraform
+    if: github.ref == 'refs/heads/main'
+
+    strategy:
+      matrix:
+        environment:
+          - 'environments/gcp/dev'
+          - 'environments/gcp/prod'
+        include:
+          - environment: 'environments/gcp/dev'
+            working-directory: 'environments/gcp/dev'
+          - environment: 'environments/gcp/prod'
+            working-directory: 'environments/gcp/prod'
 
     steps:
     - name: Deployment Approval
-      if: github.ref == 'refs/heads/main'
       uses: hmarr/auto-approve-action@v4
       with:
-        review-message: "Approve/Deny infrastructure deployment"
+        review-message: "Approve/Deny infrastructure deployment for ${{ matrix.environment }}"
         github-token: ${{ secrets.GIT_TOKEN }}
+
+    - name: Download Plan File
+      uses: actions/download-artifact@v3
+      with:
+        name: ${{ matrix.environment }}-tfplan
+
+    - name: Terraform Apply
+      working-directory: ${{ matrix.working-directory }}
+      run: terraform apply -input=false tfplan
