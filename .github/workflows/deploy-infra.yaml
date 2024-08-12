@@ -36,6 +36,7 @@ jobs:
     - name: OIDC auth
       uses: 'google-github-actions/auth@v2'
       with:
+        token_format: 'access_token'
         project_id: 'danieli-playground'
         workload_identity_provider: 'projects/1078638847138/locations/global/workloadIdentityPools/github-actions-pool/providers/github-actions-provider'
 
