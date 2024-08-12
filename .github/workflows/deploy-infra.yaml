@@ -58,7 +58,7 @@ jobs:
 
     - name: Terraform Plan
       working-directory: ${{ matrix.working-directory }}
-      run: terraform plan -out=tfplan
+      run: terraform plan -out=${{ github.workspace }}/tfplan
 
     - name: Comment Terraform Plan on PR
       uses: blinqas/tf-plan-pr-comment@v1
@@ -71,4 +71,4 @@ jobs:
     - name: Terraform Apply
       if: github.ref == 'refs/heads/main'
       working-directory: ${{ matrix.working-directory }}
-      run: terraform apply tfplan -auto-approve
+      run: terraform apply ${{ github.workspace }}/tfplan -auto-approve
