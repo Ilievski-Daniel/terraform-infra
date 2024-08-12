@@ -78,12 +78,9 @@ jobs:
       matrix:
         environment:
           - 'environments/gcp/dev'
-          - 'environments/gcp/prod'
         include:
           - environment: 'environments/gcp/dev'
             working-directory: 'environments/gcp/dev'
-          - environment: 'environments/gcp/prod'
-            working-directory: 'environments/gcp/prod'
 
     steps:
     - name: Deployment Approval
