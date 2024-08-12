@@ -70,5 +70,4 @@ jobs:
 
     - name: Terraform Apply
       if: github.ref == 'refs/heads/main'
-      working-directory: ${{ matrix.working-directory }}
       run: terraform apply ${{ github.workspace }}/plan_output.txt -auto-approve
